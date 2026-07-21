@@ -26,7 +26,9 @@ estado = {
 def ler_lux():
     # --- Conversão simplificada do valor bruto do ADC (0-4095) para escala de lux ---
     valor_bruto = ldr_pin.read()
-    return (valor_bruto / 4095) * 1000
+    lux = (valor_bruto / 4095) * 1000
+    print("DEBUG - raw:", valor_bruto, "lux calculado:", lux)
+    return lux
 
 
 def verificar_contagem_pecas(lux_atual, tempo_atual):
