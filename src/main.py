@@ -64,10 +64,9 @@ def verificar_reset(tempo_atual):
 
     tempo_estavel = time.ticks_diff(tempo_atual, estado["tempo_ultimo_evento_botao"])
     if tempo_estavel > DEBOUNCE_BOTAO:
-        if leitura_atual == 0 and estado["estado_confirmado_botao"] == 1:
+        if leitura_atual == 1 and estado["estado_confirmado_botao"] == 0:
             executar_reset_turno()
         estado["estado_confirmado_botao"] = leitura_atual
-
 
 def executar_reset_turno():
     # --- Zera contadores e cronômetros do turno atual ---
