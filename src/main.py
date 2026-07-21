@@ -2,8 +2,8 @@ import time
 from machine import Pin, ADC
 
 # --- Parâmetros de configuração ---
-LIMIAR_BLOQUEIO = 100        # lux abaixo disso = peça bloqueando o sensor
-LIMIAR_LIVRE = 500           # lux acima disso = linha livre
+LIMIAR_BLOQUEIO = 400   # acima disso = escuro (peça bloqueando)
+LIMIAR_LIVRE = 300      # abaixo disso = claro (linha livre)
 TEMPO_MICROPARADA = 5000     # ms contínuos bloqueado = alerta de micro-parada
 DEBOUNCE_BOTAO = 50          # ms de debounce do botão de reset
 
@@ -26,20 +26,18 @@ estado = {
 def ler_lux():
     # --- Conversão simplificada do valor bruto do ADC (0-4095) para escala de lux ---
     valor_bruto = ldr_pin.read()
-    lux = (valor_bruto / 4095) * 1000
-    print("DEBUG - raw:", valor_bruto, "lux calculado:", lux)
-    return lux
+    return (valor_bruto / 4095) * 1000
 
 
 def verificar_contagem_pecas(lux_atual, tempo_atual):
-    # --- Detecção de transição de descida: linha livre -> bloqueada ---
-    if not estado["bloqueado"] and lux_atual < LIMIAR_BLOQUEIO:
+     # --- Detecção de transição: livre -> bloqueada ---
+    if not estado["bloqueado"] and lux_atual > LIMIAR_BLOQUEIO:
         estado["bloqueado"] = True
         estado["tempo_inicio_bloqueio"] = tempo_atual
         estado["alerta_microparada_emitido"] = False
 
     # --- Detecção de transição de subida: bloqueada -> livre = incrementa contagem ---
-    elif estado["bloqueado"] and lux_atual > LIMIAR_LIVRE:
+    elif estado["bloqueado"] and lux_atual < LIMIAR_LIVRE:
         estado["bloqueado"] = False
         estado["contador_pecas"] += 1
         print("Peca detectada! Total: " + str(estado["contador_pecas"]))
