@@ -18,7 +18,8 @@ estado = {
     "bloqueado": False,
     "tempo_inicio_bloqueio": 0,
     "alerta_microparada_emitido": False,
-    "ultimo_estado_botao": 1,
+    "ultima_leitura_botao": 1,
+    "estado_confirmado_botao": 1,
     "tempo_ultimo_evento_botao": 0,
 }
 
@@ -54,17 +55,18 @@ def verificar_microparada(tempo_atual):
 
 def verificar_reset(tempo_atual):
     # --- Leitura do botão de reset com debounce ---
-    estado_botao_atual = btn_pin.value()
+    leitura_atual = btn_pin.value()
 
-    if estado_botao_atual != estado["ultimo_estado_botao"]:
+    if leitura_atual != estado["ultima_leitura_botao"]:
         estado["tempo_ultimo_evento_botao"] = tempo_atual
+
+    estado["ultima_leitura_botao"] = leitura_atual
 
     tempo_estavel = time.ticks_diff(tempo_atual, estado["tempo_ultimo_evento_botao"])
     if tempo_estavel > DEBOUNCE_BOTAO:
-        if estado_botao_atual == 0 and estado["ultimo_estado_botao"] == 1:
+        if leitura_atual == 0 and estado["estado_confirmado_botao"] == 1:
             executar_reset_turno()
-
-    estado["ultimo_estado_botao"] = estado_botao_atual
+        estado["estado_confirmado_botao"] = leitura_atual
 
 
 def executar_reset_turno():
